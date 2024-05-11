@@ -64,9 +64,9 @@ class ViewController: UIViewController {
                     //let wallImageView = UIImageView(image: UIImage(named: "wall"))
                     //wallImageView.frame = wallView.frame
                     //view.addSubview(wallImageView)
-                    wallView.backgroundColor = UIColor.gray
-                    view.addSubview(wallView)
-                    wallRectArray.append(wallView.frame)
+                    let wallImageView = UIImageView(image: UIImage(named: "wall"))
+                    wallImageView.frame = wallView.frame
+                    view.addSubview(wallImageView)
                 
                 case 2: //スタート地点
                     startView = createView(x: x, y: y, width: cellWidth, height: cellHeight, offsetX: cellOffsetX, offsetY: cellOffsetY)
