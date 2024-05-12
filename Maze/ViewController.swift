@@ -17,23 +17,8 @@ class ViewController: UIViewController {
     //画面サイズの取得
     let screenSize = UIScreen.main.bounds.size
     
-    //スタートとゴールを表すUIView
-    var startView: UIView!
-    var goalView: UIView!
-    
-    //wallViewのフレーム情報を入れておく配列
-    var wallRectArray = [CGRect]()
-    
-
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
-        
-        
-        
-        //迷路のマップを表した配列
-        let maze = [
+    //迷路のマップを表した配列
+    let maze = [
         [1,0,0,0,1,0],
         [1,0,1,0,1,0],
         [3,0,0,0,1,0],
@@ -44,9 +29,18 @@ class ViewController: UIViewController {
         [0,0,0,0,0,1],
         [0,1,1,0,0,0],
         [0,0,1,1,1,2]
-        ]
-        
-        
+    ]
+    
+    //スタートとゴールを表すUIView
+    var startView: UIView!
+    var goalView: UIView!
+    
+    //wallViewのフレーム情報を入れておく配列
+    var wallRectArray = [CGRect]()
+    
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
         
         let cellWidth = screenSize.width / CGFloat(maze[0].count)
         let cellHeight = screenSize.height / CGFloat(maze.count)
@@ -61,10 +55,14 @@ class ViewController: UIViewController {
                 switch maze[y][x]{
                 case 1: //当たるとゲームオーバーになるマス
                     let wallView = createView(x: x, y: y, width: cellWidth, height: cellHeight, offsetX: cellOffsetX, offsetY: cellOffsetY)
-                    //let wallImageView = UIImageView(image: UIImage(named: "wall"))
+                    //wallView.backgroundColor = UIColor.black
+                    //
+                    
                     //wallImageView.frame = wallView.frame
-                    //view.addSubview(wallImageView)
+                
                     let wallImageView = UIImageView(image: UIImage(named: "wall"))
+                    view.addSubview(wallView)
+                    wallRectArray.append(wallView.frame)
                     wallImageView.frame = wallView.frame
                     view.addSubview(wallImageView)
                 
@@ -81,6 +79,7 @@ class ViewController: UIViewController {
                 }
             }
         }
+        
         //playerViewを生成
         playerView = UIView(frame: CGRect(x:0, y:0, width: cellWidth / 6, height: cellHeight / 6))
         playerView.center = startView.center
@@ -95,7 +94,7 @@ class ViewController: UIViewController {
     }
     
    
-    
+    // 迷路の1マスとなるUIViewを作るメソッド
     func createView(x:Int, y:Int, width:CGFloat, height:CGFloat, offsetX:CGFloat, offsetY: CGFloat) -> UIView{
         let rect = CGRect(x:0, y:0, width: width, height: height)
         let view = UIView(frame: rect)
@@ -105,32 +104,6 @@ class ViewController: UIViewController {
         view.center = center
         
         return view
-    }
-    
-    func gameCheck(result: String, message: String){
-        //加速度を止める
-        if playerMotionManager.isAccelerometerActive{
-            playerMotionManager.stopAccelerometerUpdates()
-        }
-        
-        let gameCheckAlert: UIAlertController = UIAlertController(title: result, message: message, preferredStyle: .alert)
-        
-        let retryAction = UIAlertAction(title: "もう一度", style: .default, handler: {
-            (action: UIAlertAction) -> Void in
-            self.retry()
-        })
-    }
-    
-    func retry(){
-        //プレイヤーの位置を初期化
-        playerView.center = startView.center
-        //加速度センサーを止める
-        if !playerMotionManager.isAccelerometerActive{
-            startAccelerometer()
-        }
-        //スピードを初期化
-        speedX = 0.0
-        speedY = 0.0
     }
     
     func startAccelerometer(){
@@ -181,7 +154,43 @@ class ViewController: UIViewController {
         //加速度の開始
         playerMotionManager.startAccelerometerUpdates(to: OperationQueue.main, withHandler: handler)
     }
+    
+     
+        
+    
+    func gameCheck(result: String, message: String){
+        //加速度を止める
+        if playerMotionManager.isAccelerometerActive{
+            playerMotionManager.stopAccelerometerUpdates()
+        }
+        
+        let gameCheckAlert: UIAlertController = UIAlertController(title: result, message: message, preferredStyle: .alert)
+        
+        let retryAction = UIAlertAction(title: "もう一度", style: .default, handler: {
+            (action: UIAlertAction!) -> Void in
+            self.retry()
+        })
+        
+        gameCheckAlert.addAction(retryAction)
+        
+        self.present(gameCheckAlert, animated: true, completion: nil)
+    }
+    
+    func retry(){
+        //プレイヤーの位置を初期化
+        playerView.center = startView.center
+        //加速度センサーを止める
+        if !playerMotionManager.isAccelerometerActive{
+            startAccelerometer()
+        }
+        //スピードを初期化
+        speedX = 0.0
+        speedY = 0.0
+    }
+
+
+
+
 
 
 }
-
